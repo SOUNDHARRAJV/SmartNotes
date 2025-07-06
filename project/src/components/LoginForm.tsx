@@ -100,9 +100,10 @@ const LoginForm: React.FC = () => {
           {!showManualForm ? (
             <>
               {/* Google Sign-In Button */}
-              <div>
-                <div id="google-signin-button" className="w-full"></div>
-              </div>
+              <div className="flex justify-center">
+  <div id="google-signin-button"></div>
+</div>
+
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
