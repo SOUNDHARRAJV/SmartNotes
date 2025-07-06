@@ -1,3 +1,5 @@
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase/firebaseConfig"; 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
@@ -32,7 +34,14 @@ const UploadForm: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const fileUrl = selectedFile ? URL.createObjectURL(selectedFile) : undefined;
+     let fileUrl: string | undefined = undefined;
+
+if (selectedFile) {
+  const fileRef = ref(storage, `notes/${Date.now()}_${selectedFile.name}`);
+  await uploadBytes(fileRef, selectedFile);
+  fileUrl = await getDownloadURL(fileRef);
+}
+
 
       addUpload({
         title: formData.title,
