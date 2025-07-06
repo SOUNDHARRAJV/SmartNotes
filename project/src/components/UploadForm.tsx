@@ -27,57 +27,56 @@ const UploadForm: React.FC = () => {
   const categories: Category[] = ['Notes', 'Assignments', 'Projects', 'Study Materials', 'Video', 'Others'];
   const departments: Department[] = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AGRI', 'IT', 'BIOTECH', 'Others'];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!user) return;
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
 
-    try {
-     let fileUrl: string | undefined = undefined;
+  try {
+    let fileUrl: string | undefined = undefined;
 
-if (selectedFile) {
-  const fileRef = ref(storage, `notes/${Date.now()}_${selectedFile.name}`);
-  await uploadBytes(fileRef, selectedFile);
-  fileUrl = await getDownloadURL(fileRef);
-}
-
-
-      addUpload({
-        title: formData.title,
-        description: formData.description,
-        category: formData.category,
-        department: formData.department,
-        customDepartment: formData.department === 'Others' ? formData.customDepartment : undefined,
-        fileUrl,
-        fileName: selectedFile?.name,
-        fileType: selectedFile?.type,
-        uploaderId: user.id,
-        uploaderName: user.name,
-        uploaderEmail: user.email,
-      });
-
-      setPopupData({ message: 'Upload successful!', type: 'success' });
-      setShowPopup(true);
-
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        category: '' as Category,
-        department: '' as Department,
-        customDepartment: '',
-      });
-      setSelectedFile(null);
-    } catch (error) {
-      console.error('Upload failed:', error);
-      setPopupData({ message: 'Upload failed. Please try again.', type: 'error' });
-      setShowPopup(true);
-    } finally {
-      setIsSubmitting(false);
+    if (selectedFile) {
+      const fileRef = ref(storage, `notes/${Date.now()}_${selectedFile.name}`);
+      await uploadBytes(fileRef, selectedFile);
+      fileUrl = await getDownloadURL(fileRef);
     }
-  };
 
+    // 🔥 await ensures addUpload completes before resetting state
+    await addUpload({
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      department: formData.department,
+      customDepartment: formData.department === 'Others' ? formData.customDepartment : undefined,
+      fileUrl,
+      fileName: selectedFile?.name,
+      fileType: selectedFile?.type,
+      uploaderId: user.id,
+      uploaderName: user.name,
+      uploaderEmail: user.email,
+    });
+
+    setPopupData({ message: 'Upload successful!', type: 'success' });
+    setShowPopup(true);
+
+    // Reset form
+    setFormData({
+      title: '',
+      description: '',
+      category: '' as Category,
+      department: '' as Department,
+      customDepartment: '',
+    });
+    setSelectedFile(null);
+  } catch (error) {
+    console.error('Upload failed:', error);
+    setPopupData({ message: 'Upload failed. Please try again.', type: 'error' });
+    setShowPopup(true);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
