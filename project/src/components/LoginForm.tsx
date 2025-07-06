@@ -26,7 +26,7 @@ const LoginForm: React.FC = () => {
     // Initialize Google Sign-In
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: "41500527454-n8ogcieibco7nnpspf4sf61s064j1k1j.apps.googleusercontent.com", // Replace with actual client ID
+        client_id: "363745650076-ug72jrlij6q2u52ik48gdicqjg6darv6.apps.googleusercontent.com",
         callback: handleGoogleSignIn,
       });
 
