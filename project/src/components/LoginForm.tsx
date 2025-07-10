@@ -23,7 +23,6 @@ const LoginForm: React.FC = () => {
   const departments: Department[] = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AGRI', 'IT', 'BIOTECH', 'Others'];
 
   useEffect(() => {
-    // Initialize Google Sign-In
     if (window.google) {
       window.google.accounts.id.initialize({
         client_id: "363745650076-ug72jrlij6q2u52ik48gdicqjg6darv6.apps.googleusercontent.com",
@@ -45,16 +44,43 @@ const LoginForm: React.FC = () => {
 
   const handleGoogleSignIn = (response: any) => {
     setIsLoading(true);
-    
+
     try {
-      // Decode the JWT token to get user info
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
-      
+
+      const email = payload.email;
+      const name = payload.name;
+      const avatar = payload.picture;
+
+      // Restrict domain
+      const domain = email.split('@')[1];
+      if (domain !== 'bitsathy.ac.in') {
+        alert('Only bitsathy.ac.in emails are allowed.');
+        return;
+      }
+
+      // Extract department from email prefix
+      const prefix = email.split('@')[0].toLowerCase();
+      const departmentCode = prefix.slice(0, 2); // example: ag23 → ag
+
+      const departmentMap: Record<string, Department> = {
+        ag: 'AGRI',
+        cs: 'CSE',
+        ec: 'ECE',
+        ee: 'EEE',
+        me: 'MECH',
+        ce: 'CIVIL',
+        it: 'IT',
+        bt: 'BIOTECH',
+      };
+
+      const department = departmentMap[departmentCode] || 'Others';
+
       login({
-        name: payload.name,
-        email: payload.email,
-        department: 'CSE', // Default department, user can update later
-        avatar: payload.picture,
+        name,
+        email,
+        department,
+        avatar,
       });
     } catch (error) {
       console.error('Google Sign-In failed:', error);
@@ -67,17 +93,19 @@ const LoginForm: React.FC = () => {
   const handleManualSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate login process
+
     setTimeout(() => {
       login({
         name: formData.name,
         email: formData.email,
-        department: formData.department === 'Others' && formData.customDepartment 
-          ? formData.customDepartment 
-          : formData.department,
-        customDepartment: formData.department === 'Others' ? formData.customDepartment : undefined,
-        avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=1',
+        department:
+          formData.department === 'Others' && formData.customDepartment
+            ? formData.customDepartment
+            : formData.department,
+        customDepartment:
+          formData.department === 'Others' ? formData.customDepartment : undefined,
+        avatar:
+          'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=1',
       });
       setIsLoading(false);
     }, 1000);
@@ -99,11 +127,9 @@ const LoginForm: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">
           {!showManualForm ? (
             <>
-              {/* Google Sign-In Button */}
               <div className="flex justify-center">
-  <div id="google-signin-button"></div>
-</div>
-
+                <div id="google-signin-button"></div>
+              </div>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -169,16 +195,20 @@ const LoginForm: React.FC = () => {
                     id="department"
                     required
                     value={formData.department}
-                    onChange={(e) => setFormData({ 
-                      ...formData, 
-                      department: e.target.value as Department,
-                      customDepartment: e.target.value !== 'Others' ? '' : formData.customDepartment
-                    })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        department: e.target.value as Department,
+                        customDepartment: e.target.value !== 'Others' ? '' : formData.customDepartment,
+                      })
+                    }
                     className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors appearance-none"
                   >
                     <option value="">Select your department</option>
-                    {departments.map(dept => (
-                      <option key={dept} value={dept}>{dept}</option>
+                    {departments.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -228,9 +258,7 @@ const LoginForm: React.FC = () => {
         </div>
 
         <div className="text-center text-sm text-gray-500">
-          <p>
-            Secure authentication powered by Google OAuth 2.0
-          </p>
+          <p>Secure authentication powered by Google OAuth 2.0</p>
         </div>
       </div>
     </div>
