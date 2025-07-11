@@ -59,7 +59,7 @@ const departmentCodeMatch = prefix.match(/(cs|ec|ag|ee|me|ce|it|bt)/);
 const departmentCode = departmentCodeMatch ? departmentCodeMatch[0] : '';
 
 const departmentMap: Record<string, Department> = {
-  ag: 'AGRI',
+  ag: 'AGRICULTURE',
   cs: 'CSE',
   ec: 'ECE',
   ee: 'EEE',
