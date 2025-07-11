@@ -20,7 +20,7 @@ const LoginForm: React.FC = () => {
     customDepartment: '',
   });
 
-  const departments: Department[] = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AGRI', 'IT', 'BIOTECH', 'Department'];
+  const departments: Department[] = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AGRI', 'IT', 'BIOTECH', 'Others'];
 
   useEffect(() => {
     if (window.google) {

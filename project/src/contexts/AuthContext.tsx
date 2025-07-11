@@ -20,10 +20,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for saved user in localStorage
     const savedUser = localStorage.getItem('student-portal-user');
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
+      const parsedUser: User = JSON.parse(savedUser);
+      console.log('✅ Loaded user from localStorage:', parsedUser);
+      setUser(parsedUser);
     }
     setIsLoading(false);
   }, []);
@@ -33,6 +34,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       id: Date.now().toString(),
       ...userData,
     };
+
+    console.log('✅ Logging in user:', newUser);
     setUser(newUser);
     localStorage.setItem('student-portal-user', JSON.stringify(newUser));
   };
