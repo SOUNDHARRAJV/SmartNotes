@@ -63,18 +63,23 @@ const LoginForm: React.FC = () => {
       const prefix = email.split('@')[0].toLowerCase();
       const departmentCode = prefix.slice(0, 2); // example: ag23 → ag
 
-      const departmentMap: Record<string, Department> = {
-        ag: 'AGRI',
-        cs: 'CSE',
-        ec: 'ECE',
-        ee: 'EEE',
-        me: 'MECH',
-        ce: 'CIVIL',
-        it: 'IT',
-        bt: 'BIOTECH',
-      };
+      const prefix = email.split('@')[0].toLowerCase();
+const departmentCode = prefix.match(/^[a-z]{2}/)?.[0] || '';
 
-      const department = departmentMap[departmentCode] || 'Others';
+const departmentMap: Record<string, Department> = {
+  ag: 'AGRI',
+  cs: 'CSE',
+  ec: 'ECE',
+  ee: 'EEE',
+  me: 'MECH',
+  ce: 'CIVIL',
+  it: 'IT',
+  bt: 'BIOTECH',
+};
+
+const department = departmentMap[departmentCode] || 'Others';
+console.log('Email:', email, '| Extracted prefix:', prefix, '| Dept Code:', departmentCode, '| Department:', department);
+
 
       login({
         name,
