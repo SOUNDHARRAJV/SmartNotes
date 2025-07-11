@@ -68,14 +68,13 @@ const UploadCard: React.FC<UploadCardProps> = ({
           </h3>
           {upload.fileUrl && (
   <div className="flex gap-3 mb-4">
-    <a
-      href={upload.fileUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      onClick={() => alert('🚧 Soon to be updated! Stay connected.')}
       className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-md text-sm font-medium transition-colors"
     >
       View
-    </a>
+    </button>
+
     <a
       href={upload.fileUrl}
       download={upload.fileName}
@@ -85,7 +84,6 @@ const UploadCard: React.FC<UploadCardProps> = ({
     </a>
   </div>
 )}
-
         </div>
 
         <p className="text-gray-600 text-sm mb-4 line-clamp-3">
