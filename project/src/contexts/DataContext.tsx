@@ -15,15 +15,14 @@ interface DataProviderProps {
   children: ReactNode;
 }
 
-// Mock data for demonstration
 const mockUploads: Upload[] = [
   {
     id: '1',
     title: 'Data Structures and Algorithms Notes',
-    description: 'Comprehensive notes covering arrays, linked lists, trees, and graphs with examples and implementations.',
+    description: 'Comprehensive notes covering arrays, linked lists, trees, and graphs.',
     category: 'Notes',
     department: 'CSE',
-    fileUrl: '#',
+    fileUrl: 'https://www.mta.ca/~rrosebru/oldcourse/263114/Dsa.pdf',
     fileName: 'DSA_Notes.pdf',
     fileType: 'application/pdf',
     uploaderId: 'mock-user-1',
@@ -35,12 +34,12 @@ const mockUploads: Upload[] = [
   {
     id: '2',
     title: 'Circuit Analysis Assignment',
-    description: 'Assignment on AC and DC circuit analysis with solved examples and practice problems.',
+    description: 'Assignment on AC and DC circuit analysis with solved examples.',
     category: 'Assignments',
     department: 'ECE',
-    fileUrl: '#',
-    fileName: 'Circuit_Analysis.docx',
-    fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    fileUrl: 'https://fatsup.files.wordpress.com/2016/10/linear-circuit-analysis-assignmetn-1.pdf',
+    fileName: 'Circuit_Analysis.pdf',
+    fileType: 'application/pdf',
     uploaderId: 'mock-user-2',
     uploaderName: 'Jane Smith',
     uploaderEmail: 'jane.smith@student.edu',
@@ -49,13 +48,13 @@ const mockUploads: Upload[] = [
   },
   {
     id: '3',
-    title: 'Machine Learning Project',
-    description: 'Complete machine learning project on image classification using CNN with Python and TensorFlow.',
+    title: 'Machine Learning Project Guide',
+    description: 'End‑to‑end ML project workflow using Python.',
     category: 'Projects',
     department: 'IT',
-    fileUrl: '#',
-    fileName: 'ML_Project.zip',
-    fileType: 'application/zip',
+    fileUrl: 'https://amideastonline.org/pluginfile.php/66145/mod_folder/content/0/ML02%20End-to-End%20Machine%20Learning%20Project.pdf?forcedownload=1',
+    fileName: 'ML_Project.pdf',
+    fileType: 'application/pdf',
     uploaderId: 'mock-user-3',
     uploaderName: 'Mike Johnson',
     uploaderEmail: 'mike.johnson@student.edu',
@@ -65,10 +64,10 @@ const mockUploads: Upload[] = [
   {
     id: '4',
     title: 'Biotechnology Lab Manual',
-    description: 'Complete lab manual for biotechnology experiments including protocols and safety guidelines.',
+    description: 'Lab manual for biotech experiments including protocols.',
     category: 'Study Materials',
     department: 'BIOTECH',
-    fileUrl: '#',
+    fileUrl: 'https://www.rose-hulman.edu/~brandt/publications/472B_Lab_Manual_2ndEd.pdf',
     fileName: 'Biotech_Lab_Manual.pdf',
     fileType: 'application/pdf',
     uploaderId: 'mock-user-4',
@@ -78,6 +77,7 @@ const mockUploads: Upload[] = [
     updatedAt: new Date('2024-01-12'),
   },
 ];
+
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [uploads, setUploads] = useState<Upload[]>([]);
