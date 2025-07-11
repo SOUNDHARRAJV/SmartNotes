@@ -69,7 +69,7 @@ const LoginForm: React.FC = () => {
         bt: 'BIOTECH',
       };
 
-      const department = departmentMap[departmentCode] || 'Others';
+      const department = departmentMap[departmentCode] || 'Dept';
       console.log('Email:', email, '| Prefix:', prefix, '| Dept Code:', departmentCode, '| Dept:', department);
 
       login({
