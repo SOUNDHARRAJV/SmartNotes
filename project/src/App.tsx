@@ -1,14 +1,6 @@
-<<<<<<< HEAD
-
 import { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext'; 
 import { DataProvider } from './contexts/DataContext'; 
-=======
-import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext'; // ✅ fixed path
-import { DataProvider } from './contexts/DataContext'; // ✅ fixed path
-import LoginForm from './components/LoginForm';
->>>>>>> 7cb0a2203de6637ae232693bcb538f83596fda3d
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import UploadForm from './components/UploadForm';
