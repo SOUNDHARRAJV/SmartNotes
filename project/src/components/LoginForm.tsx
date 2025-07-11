@@ -54,22 +54,23 @@ const LoginForm: React.FC = () => {
         return;
       }
 
-      // Extract department from email prefix
-      const prefix = email.split('@')[0].toLowerCase();
-      const departmentCode = prefix.match(/^(cs|ec|ag|ee|me|ce|it|bt)/)?.[0] || '';
+     const prefix = email.split('@')[0].toLowerCase();
+const departmentCodeMatch = prefix.match(/(cs|ec|ag|ee|me|ce|it|bt)/);
+const departmentCode = departmentCodeMatch ? departmentCodeMatch[0] : '';
 
-      const departmentMap: Record<string, Department> = {
-        ag: 'AGRI',
-        cs: 'CSE',
-        ec: 'ECE',
-        ee: 'EEE',
-        me: 'MECH',
-        ce: 'CIVIL',
-        it: 'IT',
-        bt: 'BIOTECH',
-      };
+const departmentMap: Record<string, Department> = {
+  ag: 'AGRI',
+  cs: 'CSE',
+  ec: 'ECE',
+  ee: 'EEE',
+  me: 'MECH',
+  ce: 'CIVIL',
+  it: 'IT',
+  bt: 'BIOTECH',
+};
 
-      const department = departmentMap[departmentCode] || 'Dept';
+const department = departmentMap[departmentCode] || 'Others';
+
       console.log('Email:', email, '| Prefix:', prefix, '| Dept Code:', departmentCode, '| Dept:', department);
 
       login({
