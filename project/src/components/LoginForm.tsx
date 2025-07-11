@@ -20,61 +20,58 @@ const LoginForm: React.FC = () => {
     customDepartment: '',
   });
 
-  const departments: Department[] = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AGRI', 'IT', 'BIOTECH', 'Others'];
+  const departments: Department[] = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'AGRI', 'IT', 'BIOTECH', 'Department'];
 
   useEffect(() => {
     if (window.google) {
       window.google.accounts.id.initialize({
-        client_id: "363745650076-ug72jrlij6q2u52ik48gdicqjg6darv6.apps.googleusercontent.com",
+        client_id: '363745650076-ug72jrlij6q2u52ik48gdicqjg6darv6.apps.googleusercontent.com',
         callback: handleGoogleSignIn,
       });
 
-      window.google.accounts.id.renderButton(
-        document.getElementById("google-signin-button"),
-        {
-          theme: "outline",
-          size: "large",
-          width: "100%",
-          text: "signin_with",
-          shape: "rectangular",
-        }
-      );
+      window.google.accounts.id.renderButton(document.getElementById('google-signin-button'), {
+        theme: 'outline',
+        size: 'large',
+        width: '100%',
+        text: 'signin_with',
+        shape: 'rectangular',
+      });
     }
   }, []);
 
   const handleGoogleSignIn = (response: any) => {
     setIsLoading(true);
-
     try {
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
-
       const email = payload.email;
       const name = payload.name;
       const avatar = payload.picture;
 
-      // Restrict domain
+      // Domain restriction
       const domain = email.split('@')[1];
       if (domain !== 'bitsathy.ac.in') {
         alert('Only bitsathy.ac.in emails are allowed.');
         return;
       }
 
-      // Extract department from email prefix
-      const prefix = email.split('@')[0].toLowerCase();
-      const departmentCode = prefix.slice(0, 2); // example: ag23 → ag
+     const prefix = email.split('@')[0].toLowerCase();
+const departmentCodeMatch = prefix.match(/(cs|ec|ag|ee|me|ce|it|bt)/);
+const departmentCode = departmentCodeMatch ? departmentCodeMatch[0] : '';
 
-      const departmentMap: Record<string, Department> = {
-        ag: 'AGRI',
-        cs: 'CSE',
-        ec: 'ECE',
-        ee: 'EEE',
-        me: 'MECH',
-        ce: 'CIVIL',
-        it: 'IT',
-        bt: 'BIOTECH',
-      };
+const departmentMap: Record<string, Department> = {
+  ag: 'AGRI',
+  cs: 'CSE',
+  ec: 'ECE',
+  ee: 'EEE',
+  me: 'MECH',
+  ce: 'CIVIL',
+  it: 'IT',
+  bt: 'BIOTECH',
+};
 
-      const department = departmentMap[departmentCode] || 'Others';
+const department = departmentMap[departmentCode] || 'Others';
+
+      console.log('Email:', email, '| Prefix:', prefix, '| Dept Code:', departmentCode, '| Dept:', department);
 
       login({
         name,
@@ -119,9 +116,7 @@ const LoginForm: React.FC = () => {
             <BookOpen size={32} className="text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900">Welcome to Smart Notes</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Sign in to access your student portal
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Sign in to access your student portal</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg p-8 space-y-6">

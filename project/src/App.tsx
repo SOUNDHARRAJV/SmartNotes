@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { DataProvider } from './contexts/DataContext';
-import LoginForm from './components/LoginForm';
+
+import { useState } from 'react';
+import { AuthProvider, useAuth } from './contexts/AuthContext'; 
+import { DataProvider } from './contexts/DataContext'; 
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import UploadForm from './components/UploadForm';
 import MyUploads from './components/MyUploads';
 import About from './components/About';
+import LoginForm from './components/LoginForm';
 
 function AppContent() {
   const { user, isLoading } = useAuth();
