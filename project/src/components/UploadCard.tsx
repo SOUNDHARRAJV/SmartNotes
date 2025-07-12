@@ -7,7 +7,9 @@ import {
   Video,
   Image,
   Archive,
-  Download
+  Download,
+  Brain,
+  ExternalLink
 } from 'lucide-react';
 
 interface UploadCardProps {
@@ -23,6 +25,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
   onEdit,
   onDelete
 }) => {
+  const [showDetail, setShowDetail] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const getFileIcon = (fileType?: string) => {
@@ -58,12 +61,37 @@ const UploadCard: React.FC<UploadCardProps> = ({
     return colors[department as keyof typeof colors] || colors.Others;
   };
 
+  const generateSimpleSummary = (upload: Upload): string => {
+    const title = upload.title.toLowerCase();
+    if (title.includes('machine learning')) {
+      return 'Covers ML workflows and project lifecycle.';
+    }
+    if (title.includes('data structure')) {
+      return 'Key notes on DSA topics like arrays, trees, graphs.';
+    }
+    if (upload.category === 'Assignments') {
+      return 'Practice-focused problems with examples.';
+    }
+    if (upload.category === 'Notes') {
+      return 'Subject summary for quick understanding.';
+    }
+    if (upload.category === 'Projects') {
+      return 'Steps and flow for a hands-on project.';
+    }
+    return 'Student-uploaded academic material.';
+  };
+
   const FileIcon = getFileIcon(upload.fileType);
+  const summary = generateSimpleSummary(upload);
+
+  const chatGptLink = `https://chat.openai.com/?prompt=${encodeURIComponent(
+    `Give me a detailed overview, important points, and suggestions based on this:\n\nTitle: ${upload.title}\nDescription: ${upload.description}`
+  )}`;
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden relative">
       <div className="p-6">
-        {/* Header with title and buttons */}
+        {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 w-2/3">
             {upload.title}
@@ -88,9 +116,40 @@ const UploadCard: React.FC<UploadCardProps> = ({
         </div>
 
         {/* Description */}
-        <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-          {upload.description}
-        </p>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-3">{upload.description}</p>
+
+        {/* AI Overview */}
+        <div className="bg-gray-50 p-3 rounded-lg mb-3 border text-sm">
+          <div className="flex items-center mb-1 text-gray-800 font-medium">
+            <Brain size={16} className="mr-2 text-purple-500" />
+            AI Overview
+          </div>
+          <p className="italic">{summary}</p>
+          <button
+            onClick={() => setShowDetail(!showDetail)}
+            className="mt-2 text-sm text-blue-600 underline"
+          >
+            {showDetail ? 'Hide details' : 'View AI Details'}
+          </button>
+
+          {showDetail && (
+            <div className="mt-3 text-gray-700">
+              <ul className="list-disc list-inside">
+                <li>{upload.description}</li>
+                <li>Uploaded by: {upload.uploaderName}</li>
+                <li>Category: {upload.category}, Department: {upload.department}</li>
+              </ul>
+              <a
+                href={chatGptLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center text-green-600 hover:underline"
+              >
+                Ask ChatGPT <ExternalLink size={14} className="ml-1" />
+              </a>
+            </div>
+          )}
+        </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -114,7 +173,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
           </div>
         )}
 
-        {/* Footer info */}
+        {/* Footer */}
         <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center">
             <User size={14} className="mr-1" />
@@ -126,7 +185,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
           </div>
         </div>
 
-        {/* Edit/Delete Buttons */}
+        {/* Admin Actions */}
         {showActions && (
           <div className="mt-4 flex space-x-2">
             <button
@@ -145,7 +204,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
         )}
       </div>
 
-      {/* Modal Popup */}
+      {/* Placeholder Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 max-w-sm shadow-lg text-center">
