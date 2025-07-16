@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, AuthContextType } from '../types';
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// ✅ Exporting the context so it can be imported elsewhere
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// ✅ Custom hook for using AuthContext safely
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -34,7 +36,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       id: Date.now().toString(),
       ...userData,
     };
-
     console.log('✅ Logging in user:', newUser);
     setUser(newUser);
     localStorage.setItem('student-portal-user', JSON.stringify(newUser));

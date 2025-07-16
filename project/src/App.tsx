@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext'; 
-import { DataProvider } from './contexts/DataContext'; 
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { DataProvider } from './contexts/DataContext';
+
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import UploadForm from './components/UploadForm';
 import MyUploads from './components/MyUploads';
 import About from './components/About';
 import LoginForm from './components/LoginForm';
+import AdminDashboard from './components/AdminDashboard';
 
 function AppContent() {
   const { user, isLoading } = useAuth();
@@ -24,6 +26,12 @@ function AppContent() {
     return <LoginForm />;
   }
 
+  // ✅ Render admin dashboard directly
+  if (user.department === 'ADMIN') {
+    return <AdminDashboard />;
+  }
+
+  // ✅ Render normal student UI
   const renderContent = () => {
     switch (activeTab) {
       case 'home':

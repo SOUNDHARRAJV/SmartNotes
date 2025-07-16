@@ -4,7 +4,6 @@ import {
   Home, 
   Upload, 
   FileText, 
-  User, 
   LogOut,
   Menu,
   X,
