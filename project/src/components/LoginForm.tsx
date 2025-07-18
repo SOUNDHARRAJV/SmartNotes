@@ -33,6 +33,25 @@ const LoginForm: React.FC = () => {
     }
   }, []);
 
+  // Extract department from emails like example.ag23@bitsathy.ac.in
+  const getDepartmentFromEmail = (email: string): string => {
+    const match = email.match(/\.(\w{2,3})\d{2}@bitsathy\.ac\.in$/);
+    const deptCode = match?.[1]?.toLowerCase();
+
+    switch (deptCode) {
+      case 'cs': return 'CSE';
+      case 'ec': return 'ECE';
+      case 'ee': return 'EEE';
+      case 'me': return 'MECH';
+      case 'ce': return 'CIVIL';
+      case 'ag': return 'AGRI';
+      case 'it': return 'IT';
+      case 'bt': return 'BIOTECH';
+      case 'ai': return 'AI&DS';
+      default: return 'Others';
+    }
+  };
+
   const handleGoogleSignIn = (response: any) => {
     try {
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
@@ -46,10 +65,12 @@ const LoginForm: React.FC = () => {
         return;
       }
 
+      const department = getDepartmentFromEmail(email);
+
       login({
         name,
         email,
-        department: 'AGRI',
+        department,
         avatar,
       });
     } catch (error) {
