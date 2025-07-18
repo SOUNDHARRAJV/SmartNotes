@@ -49,7 +49,7 @@ const LoginForm: React.FC = () => {
       login({
         name,
         email,
-        department: 'Others',
+        department: 'AGRI',
         avatar,
       });
     } catch (error) {
