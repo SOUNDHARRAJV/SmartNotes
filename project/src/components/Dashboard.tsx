@@ -19,7 +19,6 @@ const LM_STUDIO_API =
   window.location.hostname === "localhost"
     ? "http://localhost:1234/v1/chat/completions"
     : "https://press-computers-parents-orange.trycloudflare.com/v1/chat/completions";
-";
 
 const MODEL_NAME = "AI_SRK_CHATBOT";
 
