@@ -15,12 +15,8 @@ import {
 } from "lucide-react";
 
 // === API Config ===
-const LM_STUDIO_API =
-  window.location.hostname === "localhost"
-    ? "http://localhost:1234/v1/chat/completions"
-    : "https://press-computers-parents-orange.trycloudflare.com/v1/chat/completions";
-
-const MODEL_NAME = "AI_SRK_CHATBOT";
+const LM_STUDIO_API = "http://localhost:1234/v1/chat/completions";
+const MODEL_NAME = "YOUR_MODEL_NAME";
 
 const Dashboard: React.FC = () => {
   const { uploads, searchUploads } = useData();
