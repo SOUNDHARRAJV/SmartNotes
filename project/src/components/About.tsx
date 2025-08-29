@@ -233,13 +233,13 @@ const About: React.FC = () => {
           <div className="text-center p-6 bg-blue-50 rounded-lg">
             <Mail size={32} className="text-blue-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Us</h3>
-            <p className="text-blue-600 font-medium">smartnotesbit@gmail.com</p>
+            <p className="text-blue-600 font-medium">teamsmartnotes@gmail.com</p>
             <p className="text-gray-600 text-sm mt-1">We'll respond within 24 hours</p>
           </div>
           <div className="text-center p-6 bg-green-50 rounded-lg">
             <Phone size={32} className="text-green-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Call Us</h3>
-            <p className="text-green-600 font-medium">+91 XXXXX XXXXX</p>
+            <p className="text-green-600 font-medium">+91 9944550033</p>
             <p className="text-gray-600 text-sm mt-1">Mon-Fri, 9 AM - 6 PM IST</p>
           </div>
         </div>

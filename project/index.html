@@ -2,16 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-        <link rel="icon" type="image/png" href="/book.jpeg" />
+    <link rel="icon" type="image/png" href="/book.jpeg" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smart Notes</title>
 
+    <!-- Google Identity Services (for login) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
   <body>
     <div id="root"></div>
 
+    <!-- Your React App entry -->
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- ✅ Botpress Chat Widget -->
+    <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js"></script>
+    <script
+      src="https://files.bpcontent.cloud/2025/08/29/05/20250829052542-9VKHPLDH.js"
+      defer
+    ></script>
   </body>
 </html>
