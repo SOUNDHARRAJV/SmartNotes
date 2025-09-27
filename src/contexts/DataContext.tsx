@@ -18,21 +18,18 @@ interface DataProviderProps {
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [uploads, setUploads] = useState<Upload[]>([]);
 
-  // Fetch all uploads (recursive)
   const fetchUploads = async (): Promise<Upload[]> => {
     const uploadsRef = ref(storage, "uploads");
     const allUploads: Upload[] = [];
 
     const traverse = async (folderRef: any) => {
       const list = await listAll(folderRef);
-
       for (const itemRef of list.items) {
         try {
           const [meta, url] = await Promise.all([
             getMetadata(itemRef),
             getDownloadURL(itemRef).catch(() => "")
           ]);
-
           const cm = meta.customMetadata || {};
           allUploads.push({
             id: itemRef.fullPath,
@@ -51,30 +48,20 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
             createdAt: meta.timeCreated ? new Date(meta.timeCreated) : new Date(),
             updatedAt: meta.updated ? new Date(meta.updated) : new Date(),
           });
-        } catch (err) {
-          console.warn("Skipping problematic file:", err);
-        }
+        } catch {}
       }
-
       for (const prefix of list.prefixes) {
         await traverse(prefix);
       }
     };
 
-    try {
-      await traverse(uploadsRef);
-    } catch (err) {
-      console.warn("No uploads folder yet or fetch failed:", err);
-      return [];
-    }
-
+    try { await traverse(uploadsRef); } catch {}
     return allUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   };
 
-  // Poll uploads every 5 seconds
+  // Poll every 5s
   useEffect(() => {
     let timer: any = null;
-
     const startPolling = async () => {
       const initial = await fetchUploads();
       setUploads(initial);
@@ -83,29 +70,20 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         setUploads(updated);
       }, 5000);
     };
-
     startPolling();
-
-    return () => {
-      if (timer) clearInterval(timer);
-    };
+    return () => timer && clearInterval(timer);
   }, []);
 
-  // Add a new upload
   const addUpload = async (uploadData: AddUploadInput) => {
-    let fileUrl: string | undefined = uploadData.fileUrl;
-    let fileName: string | undefined = uploadData.fileName;
-    let fileType: string | undefined = uploadData.fileType;
-    let storagePath: string | undefined = undefined;
+    let fileUrl = uploadData.fileUrl;
+    let fileName = uploadData.fileName;
+    let fileType = uploadData.fileType;
+    let storagePath: string | undefined;
 
     if (uploadData.file) {
-      const file = uploadData.file;
-      fileName = file.name;
-      fileType = file.type;
-      const path = `uploads/${uploadData.uploaderId}/${Date.now()}_${file.name}`;
+      const path = `uploads/${uploadData.uploaderId}/${Date.now()}_${uploadData.file.name}`;
       const storageRef = ref(storage, path);
-
-      await uploadBytes(storageRef, file, {
+      await uploadBytes(storageRef, uploadData.file, {
         customMetadata: {
           title: uploadData.title,
           description: uploadData.description,
@@ -117,7 +95,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
           uploaderEmail: uploadData.uploaderEmail,
         },
       });
-
       fileUrl = await getDownloadURL(storageRef);
       storagePath = path;
     }
@@ -141,7 +118,6 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     }, ...prev]);
   };
 
-  // Update metadata
   const updateUpload = async (_id: string, uploadData: Partial<Upload>) => {
     if (!uploadData.storagePath) return;
     const objectRef = ref(storage, uploadData.storagePath);
@@ -158,16 +134,12 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     });
   };
 
-  // Delete upload
   const deleteUpload = async (id: string) => {
     const target = uploads.find(u => u.id === id);
-    if (target?.storagePath) {
-      try { await deleteObject(ref(storage, target.storagePath)); } catch {}
-    }
+    if (target?.storagePath) { try { await deleteObject(ref(storage, target.storagePath)); } catch {} }
     setUploads(prev => prev.filter(u => u.id !== id));
   };
 
-  // Get uploads for a specific user
   const getUserUploads = async (userId: string) => {
     const userRef = ref(storage, `uploads/${userId}`);
     const allUploads: Upload[] = [];
@@ -197,43 +169,24 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
           updatedAt: meta.updated ? new Date(meta.updated) : new Date(),
         });
       }
-    } catch (err) {
-      console.warn("No uploads for this user:", err);
-    }
+    } catch {}
     return allUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   };
 
-  // Search uploads
   const searchUploads = (query: string, category?: Category, department?: Department, customDepartment?: string) => {
     let filtered = uploads;
     if (query.trim()) {
       const q = query.toLowerCase();
-      filtered = filtered.filter(u =>
-        u.title.toLowerCase().includes(q) ||
-        u.description.toLowerCase().includes(q) ||
-        u.uploaderName.toLowerCase().includes(q)
-      );
+      filtered = filtered.filter(u => u.title.toLowerCase().includes(q) || u.description.toLowerCase().includes(q) || u.uploaderName.toLowerCase().includes(q));
     }
     if (category) filtered = filtered.filter(u => u.category === category);
     if (department) {
-      if (department === 'Others') {
-        filtered = filtered.filter(u =>
-          u.department === 'Others' &&
-          u.customDepartment?.toLowerCase().includes(customDepartment?.toLowerCase() || '')
-        );
-      } else filtered = filtered.filter(u => u.department === department);
+      if (department === 'Others') filtered = filtered.filter(u => u.department === 'Others' && u.customDepartment?.toLowerCase().includes(customDepartment?.toLowerCase() || ''));
+      else filtered = filtered.filter(u => u.department === department);
     }
     return filtered;
   };
 
-  const value: DataContextType = {
-    uploads,
-    addUpload,
-    updateUpload,
-    deleteUpload,
-    getUserUploads,
-    searchUploads,
-  };
-
+  const value: DataContextType = { uploads, addUpload, updateUpload, deleteUpload, getUserUploads, searchUploads };
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
 };
