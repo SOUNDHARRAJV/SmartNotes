@@ -19,7 +19,6 @@ export interface Upload {
   fileUrl?: string;
   fileName?: string;
   fileType?: string;
-  storagePath?: string;
   uploaderId: string;
   uploaderName: string;
   uploaderEmail: string;
@@ -55,7 +54,7 @@ export interface AuthContextType {
 
 export interface DataContextType {
   uploads: Upload[];
-  addUpload: (upload: AddUploadInput) => Promise<void>;
+  addUpload: (upload: Omit<Upload, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateUpload: (id: string, upload: Partial<Upload>) => void;
   deleteUpload: (id: string) => void;
   getUserUploads: (userId: string) => Upload[];
@@ -65,23 +64,6 @@ export interface DataContextType {
     department?: Department,
     customDepartment?: string
   ) => Upload[];
-}
-
-// Input payload accepted by addUpload. Includes optional File for storage upload.
-export interface AddUploadInput {
-  title: string;
-  description: string;
-  category: Category;
-  department: Department;
-  customDepartment?: string;
-  file?: File;
-  uploaderId: string;
-  uploaderName: string;
-  uploaderEmail: string;
-  // Optional precomputed fields when no file is provided
-  fileUrl?: string;
-  fileName?: string;
-  fileType?: string;
 }
 
 export interface ContactForm {
