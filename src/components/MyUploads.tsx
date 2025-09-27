@@ -14,17 +14,14 @@ const MyUploads: React.FC<MyUploadsProps> = ({ onNavigateToUpload }) => {
   const { getUserUploads, deleteUpload } = useData();
   const [editingUpload, setEditingUpload] = useState<Upload | null>(null);
 
-  const myUploads = user ? getUserUploads(user.id) : [];
+  // ✅ Filter by user id or email
+  const myUploads = user ? getUserUploads(user.uid, user.email) : [];
   const sortedUploads = myUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
-  const handleEdit = (upload: Upload) => {
-    setEditingUpload(upload);
-  };
+  const handleEdit = (upload: Upload) => setEditingUpload(upload);
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this upload?')) {
-      deleteUpload(id);
-    }
+    if (window.confirm('Are you sure you want to delete this upload?')) deleteUpload(id);
   };
 
   return (
@@ -64,7 +61,7 @@ const MyUploads: React.FC<MyUploadsProps> = ({ onNavigateToUpload }) => {
               <UploadCard
                 key={upload.id}
                 upload={upload}
-                showActions={true}
+                showActions
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />
