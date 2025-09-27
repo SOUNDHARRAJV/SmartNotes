@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useData } from "../contexts/DataContext";
 import { Category, Department } from "../types";
