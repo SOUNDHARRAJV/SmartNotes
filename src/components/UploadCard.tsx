@@ -65,21 +65,11 @@ const UploadCard: React.FC<UploadCardProps> = ({
 
   const generateSimpleSummary = (upload: Upload): string => {
     const title = upload.title.toLowerCase();
-    if (title.includes('machine learning')) {
-      return 'Covers ML workflows and project lifecycle.';
-    }
-    if (title.includes('data structure')) {
-      return 'Key notes on DSA topics like arrays, trees, graphs.';
-    }
-    if (upload.category === 'Assignments') {
-      return 'Practice-focused problems with examples.';
-    }
-    if (upload.category === 'Notes') {
-      return 'Subject summary for quick understanding.';
-    }
-    if (upload.category === 'Projects') {
-      return 'Steps and flow for a hands-on project.';
-    }
+    if (title.includes('machine learning')) return 'Covers ML workflows and project lifecycle.';
+    if (title.includes('data structure')) return 'Key notes on DSA topics like arrays, trees, graphs.';
+    if (upload.category === 'Assignments') return 'Practice-focused problems with examples.';
+    if (upload.category === 'Notes') return 'Subject summary for quick understanding.';
+    if (upload.category === 'Projects') return 'Steps and flow for a hands-on project.';
     return 'Student-uploaded academic material.';
   };
 
@@ -89,6 +79,11 @@ const UploadCard: React.FC<UploadCardProps> = ({
   const chatGptLink = `https://chat.openai.com/?prompt=${encodeURIComponent(
     `Give me a detailed overview, important points, and suggestions based on this:\n\nTitle: ${upload.title}\nDescription: ${upload.description}`
   )}`;
+
+  // Handle Firestore Timestamp or normal date
+  const formattedDate = upload.createdAt?.toDate
+    ? upload.createdAt.toDate().toLocaleDateString()
+    : new Date(upload.createdAt).toLocaleDateString();
 
   return (
     <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden relative">
@@ -183,7 +178,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
           </div>
           <div className="flex items-center">
             <Calendar size={14} className="mr-1" />
-            <span>{upload.createdAt.toDate ? upload.createdAt.toDate().toLocaleDateString() : new Date(upload.createdAt).toLocaleDateString()}</span>
+            <span>{formattedDate}</span>
           </div>
         </div>
 
