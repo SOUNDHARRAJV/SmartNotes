@@ -108,7 +108,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
               </button>
               <a
                 href={upload.fileUrl}
-                download={upload.fileName}
+                download={upload.fileName || undefined}
                 className="bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded-md text-sm font-medium transition-colors"
               >
                 <Download size={16} />
@@ -183,7 +183,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
           </div>
           <div className="flex items-center">
             <Calendar size={14} className="mr-1" />
-            <span>{upload.createdAt.toLocaleDateString()}</span>
+            <span>{upload.createdAt.toDate ? upload.createdAt.toDate().toLocaleDateString() : new Date(upload.createdAt).toLocaleDateString()}</span>
           </div>
         </div>
 
@@ -207,7 +207,7 @@ const UploadCard: React.FC<UploadCardProps> = ({
       </div>
 
       {/* File Preview Modal */}
-      {showModal && (
+      {showModal && upload.fileUrl && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg p-4 max-w-3xl w-full relative">
             <button
@@ -237,22 +237,20 @@ const UploadCard: React.FC<UploadCardProps> = ({
               />
             )}
 
-            {!upload.fileType?.includes('image') &&
-              !upload.fileType?.includes('video') &&
-              !upload.fileType?.includes('pdf') && (
-                <p className="text-gray-600">
-                  Preview not available. Please{' '}
-                  <a
-                    href={upload.fileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 underline"
-                  >
-                    download the file
-                  </a>
-                  .
-                </p>
-              )}
+            {!['image', 'video', 'pdf'].some(t => upload.fileType?.includes(t)) && (
+              <p className="text-gray-600">
+                Preview not available. Please{' '}
+                <a
+                  href={upload.fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline"
+                >
+                  download the file
+                </a>
+                .
+              </p>
+            )}
           </div>
         </div>
       )}
