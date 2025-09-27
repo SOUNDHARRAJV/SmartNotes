@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
 import { Upload } from '../types';
@@ -12,16 +12,25 @@ interface MyUploadsProps {
 const MyUploads: React.FC<MyUploadsProps> = ({ onNavigateToUpload }) => {
   const { user } = useAuth();
   const { getUserUploads, deleteUpload } = useData();
-  const [editingUpload, setEditingUpload] = useState<Upload | null>(null);
+  const [myUploads, setMyUploads] = useState<Upload[]>([]);
 
-  // ✅ Filter by user id or email
-  const myUploads = user ? getUserUploads(user.uid, user.email) : [];
+  // Refresh my uploads whenever user or global uploads change
+  useEffect(() => {
+    if (user) {
+      const uploads = getUserUploads(user.uid);
+      setMyUploads(uploads);
+    }
+  }, [user, getUserUploads]);
+
   const sortedUploads = myUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const [editingUpload, setEditingUpload] = useState<Upload | null>(null);
 
   const handleEdit = (upload: Upload) => setEditingUpload(upload);
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this upload?')) deleteUpload(id);
+    if (window.confirm('Are you sure you want to delete this upload?')) {
+      deleteUpload(id);
+    }
   };
 
   return (
@@ -61,7 +70,7 @@ const MyUploads: React.FC<MyUploadsProps> = ({ onNavigateToUpload }) => {
               <UploadCard
                 key={upload.id}
                 upload={upload}
-                showActions
+                showActions={true}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
               />
