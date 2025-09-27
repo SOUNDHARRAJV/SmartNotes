@@ -17,10 +17,11 @@ interface DataProviderProps {
 
 export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
   const [uploads, setUploads] = useState<Upload[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Recursive fetch
+  // Fetch all uploads from Firebase Storage recursively
   const fetchUploads = async (): Promise<Upload[]> => {
-    const uploadsRef = ref(storage, "uploads");
+    const uploadsRef = ref(storage, 'uploads');
     const allUploads: Upload[] = [];
 
     const traverse = async (folderRef: any) => {
@@ -31,33 +32,34 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
         try {
           const [meta, url] = await Promise.all([
             getMetadata(itemRef),
-            getDownloadURL(itemRef).catch(() => ""),
+            getDownloadURL(itemRef).catch(() => undefined),
           ]);
 
           const cm = meta.customMetadata || {};
+
           allUploads.push({
             id: itemRef.fullPath,
             title: cm.title || meta.name,
-            description: cm.description || "",
-            category: (cm.category as Category) || "Others",
-            department: (cm.department as Department) || "Others",
+            description: cm.description || '',
+            category: (cm.category as Category) || 'Others',
+            department: (cm.department as Department) || 'Others',
             customDepartment: cm.customDepartment || undefined,
-            fileUrl: url || undefined,
+            fileUrl: url,
             fileName: meta.name,
             fileType: meta.contentType || undefined,
             storagePath: itemRef.fullPath,
-            uploaderId: cm.uploaderId || "unknown",
-            uploaderName: cm.uploaderName || "Unknown",
-            uploaderEmail: cm.uploaderEmail || "",
+            uploaderId: cm.uploaderId || '', // Ensure consistent filtering
+            uploaderName: cm.uploaderName || 'Unknown',
+            uploaderEmail: cm.uploaderEmail || '',
             createdAt: meta.timeCreated ? new Date(meta.timeCreated) : new Date(),
             updatedAt: meta.updated ? new Date(meta.updated) : new Date(),
           });
         } catch (err) {
-          console.warn("Skipping problematic file:", err);
+          console.warn('Skipping problematic file:', err);
         }
       }
 
-      // Go deeper into subfolders
+      // Recurse into subfolders
       for (const prefix of list.prefixes) {
         await traverse(prefix);
       }
@@ -66,36 +68,30 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     try {
       await traverse(uploadsRef);
     } catch (err) {
-      console.warn("No uploads folder yet or fetch failed:", err);
+      console.warn('No uploads folder yet or fetch failed:', err);
       return [];
     }
 
-    return [...allUploads].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    );
+    return allUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   };
 
-  // Polling every 5s
+  // Load uploads once on mount
   useEffect(() => {
-    let timer: any = null;
+    let isMounted = true;
 
-    const startPolling = async () => {
-      const first = await fetchUploads();
-      setUploads(first);
-      timer = setInterval(async () => {
-        const next = await fetchUploads();
-        setUploads(next);
-      }, 5000);
+    const loadUploads = async () => {
+      setLoading(true);
+      const data = await fetchUploads();
+      if (isMounted) setUploads(data);
+      setLoading(false);
     };
 
-    startPolling();
+    loadUploads();
 
-    return () => {
-      if (timer) clearInterval(timer);
-    };
+    return () => { isMounted = false; };
   }, []);
 
-  // Add upload
+  // Add new upload
   const addUpload = async (uploadData: AddUploadInput) => {
     let fileUrl: string | undefined = uploadData.fileUrl;
     let fileName: string | undefined = uploadData.fileName;
@@ -127,26 +123,29 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     }
 
     // Optimistic UI
-    setUploads(prev => [{
-      id: `${Date.now()}`,
-      title: uploadData.title,
-      description: uploadData.description,
-      category: uploadData.category,
-      department: uploadData.department,
-      customDepartment: uploadData.customDepartment || undefined,
-      fileUrl,
-      fileName,
-      fileType,
-      storagePath,
-      uploaderId: uploadData.uploaderId,
-      uploaderName: uploadData.uploaderName,
-      uploaderEmail: uploadData.uploaderEmail,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }, ...prev]);
+    setUploads(prev => [
+      {
+        id: `${Date.now()}`,
+        title: uploadData.title,
+        description: uploadData.description,
+        category: uploadData.category,
+        department: uploadData.department,
+        customDepartment: uploadData.customDepartment || undefined,
+        fileUrl,
+        fileName,
+        fileType,
+        storagePath,
+        uploaderId: uploadData.uploaderId,
+        uploaderName: uploadData.uploaderName,
+        uploaderEmail: uploadData.uploaderEmail,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      ...prev,
+    ]);
   };
 
-  // Update metadata
+  // Update metadata of a file
   const updateUpload = async (_id: string, uploadData: Partial<Upload>) => {
     if (!uploadData.storagePath) return;
     const objectRef = ref(storage, uploadData.storagePath);
@@ -163,6 +162,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     });
   };
 
+  // Delete an upload
   const deleteUpload = async (id: string) => {
     const target = uploads.find(u => u.id === id);
     if (target?.storagePath) {
@@ -171,8 +171,14 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     setUploads(prev => prev.filter(u => u.id !== id));
   };
 
-  const getUserUploads = (userId: string) => uploads.filter(u => u.uploaderId === userId);
+  // Get uploads of a specific user
+  const getUserUploads = (userId: string) => {
+    const filtered = uploads.filter(u => u.uploaderId === userId);
+    console.log('Filtering uploads for userId:', userId, filtered);
+    return filtered;
+  };
 
+  // Search uploads with optional filters
   const searchUploads = (
     query: string,
     category?: Category,
@@ -211,5 +217,9 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
     searchUploads,
   };
 
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+  return (
+    <DataContext.Provider value={value}>
+      {loading ? <div className="text-center py-6">Loading uploads...</div> : children}
+    </DataContext.Provider>
+  );
 };
