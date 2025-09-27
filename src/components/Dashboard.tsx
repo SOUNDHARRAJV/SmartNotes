@@ -1,16 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { useData } from "../contexts/DataContext";
 import { Category, Department } from "../types";
 import UploadCard from "./UploadCard";
 import SearchFilters from "./SearchFilters";
-import {
-  BookOpen,
-  Users,
-  TrendingUp,
-  Calendar,
-} from "lucide-react";
-
+import { BookOpen, Users, TrendingUp, Calendar } from "lucide-react";
 
 const Dashboard: React.FC = () => {
   const { uploads, searchUploads } = useData();
@@ -18,28 +11,33 @@ const Dashboard: React.FC = () => {
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category | "">("");
-  const [selectedDepartment, setSelectedDepartment] =
-    useState<Department | "">("");
+  const [selectedDepartment, setSelectedDepartment] = useState<Department | "">("");
   const [customDepartment, setCustomDepartment] = useState("");
 
-  // ✅ Load Botpress widget on mount
+  // Loading placeholder for stats
+  const [stats, setStats] = useState({
+    totalUploads: "...",
+    totalUsers: "...",
+    categoriesCount: "...",
+    thisWeek: "...",
+  });
+
+  // Update stats after 1–2 seconds or when uploads change
   useEffect(() => {
-    const inject = document.createElement("script");
-    inject.src = "https://cdn.botpress.cloud/webchat/v3.2/inject.js";
-    inject.async = true;
-    document.body.appendChild(inject);
+    const timer = setTimeout(() => {
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
 
-    const config = document.createElement("script");
-    config.src =
-      "https://files.bpcontent.cloud/2025/08/29/05/20250829052542-9VKHPLDH.js";
-    config.defer = true;
-    document.body.appendChild(config);
+      setStats({
+        totalUploads: uploads.length,
+        totalUsers: new Set(uploads.map((u) => u.uploaderId)).size,
+        categoriesCount: new Set(uploads.map((u) => u.category)).size,
+        thisWeek: uploads.filter((u) => u.createdAt >= weekAgo).length,
+      });
+    }, 2000); // 1 second placeholder
 
-    return () => {
-      document.body.removeChild(inject);
-      document.body.removeChild(config);
-    };
-  }, []);
+    return () => clearTimeout(timer);
+  }, [uploads]);
 
   // Filter uploads
   const filteredUploads = searchUploads(
@@ -48,21 +46,10 @@ const Dashboard: React.FC = () => {
     selectedDepartment || undefined,
     selectedDepartment === "Others" ? customDepartment : undefined
   );
+
   const sortedUploads = filteredUploads.sort(
     (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
   );
-
-  // Dashboard stats
-  const stats = {
-    totalUploads: uploads.length,
-    totalUsers: new Set(uploads.map((u) => u.uploaderId)).size,
-    categoriesCount: new Set(uploads.map((u) => u.category)).size,
-    thisWeek: uploads.filter((u) => {
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return u.createdAt >= weekAgo;
-    }).length,
-  };
 
   return (
     <div className="space-y-6 relative min-h-screen">
@@ -118,8 +105,7 @@ const Dashboard: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-semibold mb-6 text-gray-900">
           Recent Uploads{" "}
-          {filteredUploads.length !== uploads.length &&
-            `(${filteredUploads.length} results)`}
+          {filteredUploads.length !== uploads.length && `(${filteredUploads.length} results)`}
         </h2>
         {sortedUploads.length === 0 ? (
           <EmptyUploads />
@@ -131,8 +117,6 @@ const Dashboard: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* ✅ Botpress widget appears automatically (floating button) */}
     </div>
   );
 };
@@ -146,7 +130,7 @@ const StatCard = ({
 }: {
   icon: JSX.Element;
   bg: string;
-  value: number;
+  value: number | string;
   label: string;
 }) => (
   <div className="bg-white rounded-xl shadow-sm p-6 flex items-center">
