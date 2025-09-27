@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useData } from '../contexts/DataContext';
-import { Upload } from '../types';
 import UploadCard from './UploadCard';
 import { FileText, Plus } from 'lucide-react';
+import { Upload } from '../types';
 
 interface MyUploadsProps {
   onNavigateToUpload: () => void;
@@ -11,73 +11,70 @@ interface MyUploadsProps {
 
 const MyUploads: React.FC<MyUploadsProps> = ({ onNavigateToUpload }) => {
   const { user } = useAuth();
-  const { getUserUploads, deleteUpload } = useData();
+  const { fetchUserUploads, deleteUpload } = useData();
   const [myUploads, setMyUploads] = useState<Upload[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Refresh my uploads whenever user or global uploads change
   useEffect(() => {
-    if (user) {
-      const uploads = getUserUploads(user.uid);
+    if (!user) return;
+
+    const loadMyUploads = async () => {
+      setLoading(true);
+      const uploads = await fetchUserUploads(user.uid);
       setMyUploads(uploads);
-    }
-  }, [user, getUserUploads]);
+      setLoading(false);
+    };
+
+    loadMyUploads();
+  }, [user, fetchUserUploads]);
 
   const sortedUploads = myUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  const [editingUpload, setEditingUpload] = useState<Upload | null>(null);
 
-  const handleEdit = (upload: Upload) => setEditingUpload(upload);
-
-  const handleDelete = (id: string) => {
+  const handleDelete = (upload: Upload) => {
     if (window.confirm('Are you sure you want to delete this upload?')) {
-      deleteUpload(id);
+      deleteUpload(upload);
+      setMyUploads(prev => prev.filter(u => u.id !== upload.id));
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Uploads</h1>
-            <p className="text-gray-500 mt-1">
-              Manage your uploaded content ({myUploads.length} items)
-            </p>
-          </div>
-          <button
-            onClick={onNavigateToUpload}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center"
-          >
-            <Plus size={18} className="mr-2" />
-            New Upload
-          </button>
-        </div>
-
-        {sortedUploads.length === 0 ? (
-          <div className="text-center py-12">
-            <FileText size={48} className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No uploads yet</h3>
-            <p className="text-gray-500 mb-4">Start sharing your knowledge with the community!</p>
+      {loading ? (
+        <div className="text-center py-12">Loading your uploads...</div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">My Uploads</h1>
+              <p className="text-gray-500 mt-1">{myUploads.length} items</p>
+            </div>
             <button
               onClick={onNavigateToUpload}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center"
             >
-              Create Your First Upload
+              <Plus size={18} className="mr-2" /> New Upload
             </button>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedUploads.map(upload => (
-              <UploadCard
-                key={upload.id}
-                upload={upload}
-                showActions={true}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+
+          {sortedUploads.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText size={48} className="mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-500">Start uploading your files!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedUploads.map(upload => (
+                <UploadCard
+                  key={upload.id}
+                  upload={upload}
+                  showActions
+                  onDelete={() => handleDelete(upload)}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
