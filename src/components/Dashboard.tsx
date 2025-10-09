@@ -9,10 +9,10 @@ const Dashboard: React.FC = () => {
   const { uploads, searchUploads } = useData();
 
   const [stats, setStats] = useState({
-    totalUploads: "...",
-    totalUsers: "...",
-    categoriesCount: "...",
-    thisWeek: "...",
+    totalUploads: 0,
+    totalUsers: 0,
+    categoriesCount: 0,
+    thisWeek: 0,
   });
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -26,9 +26,13 @@ const Dashboard: React.FC = () => {
       weekAgo.setDate(weekAgo.getDate() - 7);
       setStats({
         totalUploads: uploads.length,
-        totalUsers: new Set(uploads.map(u => u.uploaderId)).size,
+        totalUsers: new Set(uploads.map(u => u.uploader_name)).size,
         categoriesCount: new Set(uploads.map(u => u.category)).size,
-        thisWeek: uploads.filter(u => u.createdAt >= weekAgo).length,
+        thisWeek: uploads.filter(u => {
+          if (!u.uploaded_at) return false;
+          const uploadedDate = new Date(u.uploaded_at);
+          return uploadedDate >= weekAgo;
+        }).length,
       });
     }, 3500);
     return () => clearTimeout(timer);
@@ -41,7 +45,11 @@ const Dashboard: React.FC = () => {
     selectedDepartment === "Others" ? customDepartment : undefined
   );
 
-  const sortedUploads = filteredUploads.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  const sortedUploads = filteredUploads.slice().sort((a, b) => {
+    const dateA = a.uploaded_at ? new Date(a.uploaded_at).getTime() : 0;
+    const dateB = b.uploaded_at ? new Date(b.uploaded_at).getTime() : 0;
+    return dateB - dateA;
+  });
 
   return (
     <div className="space-y-6 min-h-screen">
@@ -65,7 +73,12 @@ const Dashboard: React.FC = () => {
         </h2>
         {sortedUploads.length === 0 ? <EmptyUploads /> : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedUploads.map(upload => <UploadCard key={upload.id} upload={upload} />)}
+            {sortedUploads
+              .filter(upload => typeof upload.id === 'number' && !isNaN(upload.id))
+              .map(upload => <UploadCard key={upload.id} upload={upload} />)}
+            {sortedUploads
+              .filter(upload => typeof upload.id !== 'number' || isNaN(upload.id))
+              .map((upload, idx) => <UploadCard key={`invalid-${idx}`} upload={upload} />)}
           </div>
         )}
       </div>

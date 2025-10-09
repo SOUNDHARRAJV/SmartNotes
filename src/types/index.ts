@@ -9,25 +9,7 @@ export interface User {
   customDepartment?: string;
 }
 
-export interface Upload {
-  id: string;
-  title: string;
-  description: string;
-  category: Category;
-  department: Department;
-  customDepartment?: string;
-  fileUrl?: string;
-  fileName?: string;
-  fileType?: string;
-  storagePath?: string;
-  uploaderId: string;
-  uploaderName: string;
-  uploaderEmail: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type Category = 
+export type Category =
   | 'Notes'
   | 'Assignments'
   | 'Projects'
@@ -35,7 +17,7 @@ export type Category =
   | 'Video'
   | 'Others';
 
-export type Department = 
+export type Department =
   | 'CSE'
   | 'ECE'
   | 'EEE'
@@ -45,6 +27,31 @@ export type Department =
   | 'IT'
   | 'BIOTECH'
   | 'Others';
+
+// Matches your Supabase “uploads” table
+export interface Upload {
+  id: number | string;
+  title: string;
+  department: string;
+  file_url: string;
+  uploaded_at: string;
+  uploader_name: string;
+  uploader_email: string;
+  category?: Category;
+  customDepartment?: string;
+}
+
+export interface AddUploadInput {
+  title: string;
+  department: string;
+  file?: File;
+  file_url?: string;
+  uploaderId: string;
+  uploaderName: string;
+  uploaderEmail: string;
+  category?: Category;
+  customDepartment?: string;
+}
 
 export interface AuthContextType {
   user: User | null;
@@ -56,46 +63,12 @@ export interface AuthContextType {
 export interface DataContextType {
   uploads: Upload[];
   addUpload: (upload: AddUploadInput) => Promise<void>;
-  updateUpload: (id: string, upload: Partial<Upload>) => void;
-  deleteUpload: (id: string) => void;
-  getUserUploads: (userId: string) => Upload[];
+  deleteUpload: (id: number) => Promise<void>;
+  getUserUploads: (userId: string) => Promise<Upload[]>;
   searchUploads: (
     query: string,
     category?: Category,
-    department?: Department,
+    department?: string,
     customDepartment?: string
   ) => Upload[];
-}
-
-// Input payload accepted by addUpload. Includes optional File for storage upload.
-export interface AddUploadInput {
-  title: string;
-  description: string;
-  category: Category;
-  department: Department;
-  customDepartment?: string;
-  file?: File;
-  uploaderId: string;
-  uploaderName: string;
-  uploaderEmail: string;
-  // Optional precomputed fields when no file is provided
-  fileUrl?: string;
-  fileName?: string;
-  fileType?: string;
-}
-
-export interface ContactForm {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-}
-
-export interface CommunityForm {
-  name: string;
-  email: string;
-  department: Department;
-  customDepartment?: string;
-  interests: string;
-  reason: string;
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BookOpen, Users, Target, Award, Mail, Phone, Send, UserPlus, CheckCircle } from 'lucide-react';
 import { ContactForm, CommunityForm, Department } from '../types';
-
+import srks from "../srks.jpg";
 const About: React.FC = () => {
   const [showContactForm, setShowContactForm] = useState(false);
   const [showCommunityForm, setShowCommunityForm] = useState(false);
@@ -29,7 +29,7 @@ const About: React.FC = () => {
     {
       name: 'Soundhar Raj V',
       role: 'Co-Founder & CEO',
-      image: 'https://i.pinimg.com/originals/f2/59/22/f25922fde5d5a44bd82b0336a7d9b23e.jpg',
+      image: srks,
       description: 'Visionary leader with expertise in educational technology and student engagement.'
     },
     {

@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAzIwRTP2Dlv_AtPlQjkM6mTFgH4g3JSyQ",
   authDomain: "smartnotes-b278e.firebaseapp.com",
   projectId: "smartnotes-b278e",
-  storageBucket: "smartnotes-b278e.firebasestorage.app", 
+  storageBucket: "smartnotes-b278e.appspot.com", 
   messagingSenderId: "152910152746",
   appId: "1:152910152746:web:34bf5f9b4c734678e46f53",
   measurementId: "G-WJ6DR1VEF1",

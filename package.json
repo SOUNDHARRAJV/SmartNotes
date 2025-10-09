@@ -15,6 +15,8 @@
   "description": "",
   "dependencies": {
     "@dataconnect/generated": "file:src/dataconnect-generated",
+    "@supabase/supabase-js": "^2.58.0",
+    "@uploadcare/upload-client": "^6.18.0",
     "firebase": "^12.2.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.1",
